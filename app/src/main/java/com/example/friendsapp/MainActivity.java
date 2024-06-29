@@ -12,9 +12,20 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MainActivity extends AppCompatActivity {
     EditText e1,e2,e3,e4;
     AppCompatButton b1;
+    String url="https://friendsapi-re5a.onrender.com/adddata";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,7 +43,41 @@ public class MainActivity extends AppCompatActivity {
                 String getFname = e2.getText().toString();
                 String getFnname = e3.getText().toString();
                 String getDesc = e4.getText().toString();
-                Toast.makeText(getApplicationContext(),getName+" "+getFname+" "+getFnname+" "+getDesc,Toast.LENGTH_LONG).show();
+                //JSON object creation
+                JSONObject friend=new JSONObject();
+                try {
+                    friend.put("name",getName);
+                    friend.put("friendName",getFname);
+                    friend.put("friendNickName",getFnname);
+                    friend.put("DescribeYourFriend",getDesc);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+
+                //json object request creation
+                JsonObjectRequest jsonobjectrequest=new JsonObjectRequest(Request.Method.POST,
+                        url,
+                        friend,
+                        new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                Toast.makeText(getApplicationContext(),"Submitted Successfully", Toast.LENGTH_LONG).show();
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Toast.makeText(getApplicationContext(),"Something Went wrong", Toast.LENGTH_LONG).show();
+
+                            }
+                        }
+                );
+                //Request Queue
+                RequestQueue requestqueue= Volley.newRequestQueue(getApplicationContext());
+                requestqueue.add(jsonobjectrequest);
+
+
+
 
             }
         });
